@@ -1,0 +1,51 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+    {
+      "type": "cppbuild",
+      "label": "Build Event Example",
+      "command": "/usr/bin/clang++",
+      "args": [
+        "-std=c++20",
+        "-fcolor-diagnostics",
+        "-fansi-escape-codes",
+        "-g",
+        "${workspaceFolder}/*.cpp",
+        "-o",
+        "${workspaceFolder}/${workspaceFolderBasename}"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "clang++ compiler"
+    },
+    {
+      "type": "shell",
+      "label": "Clean Project",
+      "command": "rm",
+      "args": [
+        "-rvf",
+        "${workspaceFolder}/${workspaceFolderBasename}",
+        "${workspaceFolder}/*.dSYM"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "remove built objects"
+    }
+  ]
+}
