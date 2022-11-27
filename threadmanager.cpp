@@ -6,7 +6,7 @@ using namespace std::chrono;
 using std::function;
 using std::thread;
 
-namespace lb {
+namespace thorup {
 
 void threadmanager::start_thread(std::string name, uint64_t time_us,
                          function<ThreadStatus(std::string, uint64_t)> func) {
@@ -97,4 +97,4 @@ void threadmanager::prune_thread_handle_map() {
   }
 }
 
-} // namespace lb
+} // namespace thorup

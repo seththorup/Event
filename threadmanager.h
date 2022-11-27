@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace lb {
+namespace thorup {
 
 enum class ThreadStatus { NOT_DEFINED = 0, ACTIVE, READY, SUCCESS, FAILED };
 
@@ -53,4 +53,4 @@ public:
   uint32_t num_active_threads();
   void prune_thread_handle_map();
 };
-} // namespace lb
+} // namespace thorup

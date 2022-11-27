@@ -14,7 +14,7 @@ std::mutex g_mutex;
 std::condition_variable g_cv;
 bool g_ready;
 
-lb::ThreadStatus dummy_func(string name, uint64_t sleep_time_us) {
+thorup::ThreadStatus dummy_func(string name, uint64_t sleep_time_us) {
 
   cout << "Waiting on conditional Variable" << endl;
 
@@ -29,12 +29,12 @@ lb::ThreadStatus dummy_func(string name, uint64_t sleep_time_us) {
 
   cout << "Exiting Thread " << name << endl;
 
-  return lb::ThreadStatus::SUCCESS;
+  return thorup::ThreadStatus::SUCCESS;
 }
 
 int main() {
 
-  lb::threadmanager lb_event;
+  thorup::threadmanager lb_event;
   std::vector<std::pair<string, uint32_t>> func_vec = {
       {"func_1", 300}, {"func_2", 200}, {"func_3", 100}};
 
@@ -66,11 +66,11 @@ int main() {
       for (auto itr = func_vec.begin(); itr != func_vec.end(); itr++) {
         auto thread_name = itr->first;
         auto status = lb_event.get_thread_status(thread_name);
-        if (status != lb::ThreadStatus::ACTIVE &&
-            status != lb::ThreadStatus::NOT_DEFINED) {
+        if (status != thorup::ThreadStatus::ACTIVE &&
+            status != thorup::ThreadStatus::NOT_DEFINED) {
           auto result = lb_event.get_thread_result(thread_name);
           cout << thread_name
-               << " complete. Result = " << lb::thread_status_to_string(result)
+               << " complete. Result = " << thorup::thread_status_to_string(result)
                << endl;
         }
       }
