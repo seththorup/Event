@@ -3,7 +3,7 @@
 	"tasks": [
     {
       "type": "cppbuild",
-      "label": "Build Event Example",
+      "label": "Build threadmanager Example",
       "command": "/usr/bin/clang++",
       "args": [
         "-std=c++20",
@@ -12,7 +12,7 @@
         "-g",
         "${workspaceFolder}/*.cpp",
         "-o",
-        "${workspaceFolder}/${workspaceFolderBasename}"
+        "${workspaceFolder}/${workspaceFolderBasename}_example"
       ],
       "options": {
         "cwd": "${fileDirname}"
@@ -28,11 +28,11 @@
     },
     {
       "type": "shell",
-      "label": "Clean Project",
+      "label": "Clean Example",
       "command": "rm",
       "args": [
         "-rvf",
-        "${workspaceFolder}/${workspaceFolderBasename}",
+        "${workspaceFolder}/${workspaceFolderBasename}_example",
         "${workspaceFolder}/*.dSYM"
       ],
       "options": {
@@ -45,7 +45,53 @@
         "kind": "build",
         "isDefault": true
       },
-      "detail": "remove built objects"
+      "detail": "remove example objects"
+    },
+    {
+      "type": "cppbuild",
+      "label": "Build Lib",
+      "command": "/usr/bin/clang++",
+      "args": [
+        "-std=c++20",
+        "-fcolor-diagnostics",
+        "-fansi-escape-codes",
+        "-fPIC",
+        "-c",
+        "${workspaceFolder}/${workspaceFolderBasename}.cpp",
+        "-o",
+        "${workspaceFolder}/${workspaceFolderBasename}.o"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Clang++: build object"
+    },
+    {
+      "type": "shell",
+      "label": "Clean Lib",
+      "command": "rm",
+      "args": [
+        "-rvf",
+        "${workspaceFolder}/${workspaceFolderBasename}.o"
+      ],
+      "options": {
+        "cwd": "${fileDirname}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "remove lib objects"
     }
   ]
 }
