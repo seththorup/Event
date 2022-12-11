@@ -21,8 +21,8 @@ thorup::ThreadStatus dummy_func(string name, uint64_t sleep_time_us) {
   std::unique_lock lk(g_mutex);
   g_cv.wait(lk, [] { return g_ready; });
 
-  cout << "In Thread " << name << " sleeping for " << sleep_time_us
-       << " (us)" << endl;
+  cout << "In Thread " << name << " sleeping for " << sleep_time_us << " (us)"
+       << endl;
   lk.unlock();
 
   std::this_thread::sleep_for(std::chrono::microseconds(sleep_time_us));
@@ -69,9 +69,8 @@ int main() {
         if (status != thorup::ThreadStatus::ACTIVE &&
             status != thorup::ThreadStatus::NOT_DEFINED) {
           auto result = lb_event.get_thread_result(thread_name);
-          cout << thread_name
-               << " complete. Result = " << thorup::thread_status_to_string(result)
-               << endl;
+          cout << thread_name << " complete. Result = "
+               << thorup::thread_status_to_string(result) << endl;
         }
       }
     }

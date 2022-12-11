@@ -8,18 +8,6 @@ using std::thread;
 
 namespace thorup {
 
-void threadmanager::start_thread(std::string name, uint64_t time_us,
-                         function<ThreadStatus(std::string, uint64_t)> func) {
-  if (auto map_itr = thread_handle_map.find(name);
-      map_itr == thread_handle_map.end()) {
-    std::future<ThreadStatus> f =
-        std::async(std::launch::async, func, name, time_us);
-    thread_handle_map.insert({name, std::move(f)});
-  } else {
-    std::cout << "Thread " << name << " already started" << std::endl;
-  }
-}
-
 ThreadStatus threadmanager::wait_on_thread(std::string name) {
   ThreadStatus status{ThreadStatus::NOT_DEFINED};
   if (auto map_itr = thread_handle_map.find(name);
