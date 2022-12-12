@@ -9,7 +9,7 @@ using std::thread;
 namespace thorup {
 
 // TODO if no param is passed in, assume waiting on all threads
-should loop through the map and wait on everything. 
+// should loop through the map and wait on everything. 
 ThreadStatus threadmanager::wait_on_thread(std::string name) {
   ThreadStatus status{ThreadStatus::NOT_DEFINED};
   if(name == "last") {
