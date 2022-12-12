@@ -8,8 +8,13 @@ using std::thread;
 
 namespace thorup {
 
+// TODO if no param is passed in, assume waiting on all threads
+should loop through the map and wait on everything. 
 ThreadStatus threadmanager::wait_on_thread(std::string name) {
   ThreadStatus status{ThreadStatus::NOT_DEFINED};
+  if(name == "last") {
+    name = m_last_thread;
+  }
   if (auto map_itr = thread_handle_map.find(name);
       map_itr != thread_handle_map.end()) {
     status = map_itr->second.get();

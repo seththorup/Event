@@ -40,15 +40,20 @@ class threadmanager {
 private:
   std::map<std::string, std::future<ThreadStatus>> thread_handle_map;
   ThreadStatus get_thread_status(std::future<ThreadStatus> &f);
+  std::string m_last_thread;
 
 public:
   threadmanager() = default;
 
   template <typename T>
-  void start_thread(std::string name, T val,
-                    ThreadStatus (*func)(std::string, T));
+  void start_thread(std::string name, T val, uint32_t node_id,
+                    std::shared_ptr<std::vector<uint32_t>> tx_nodes, double sim_time_start,
+                    double sim_time_end,
+                    ThreadStatus (*func)(std::string, T, uint32_t,
+                                         std::shared_ptr<std::vector<uint32_t>>, double,
+                                         double));
 
-  ThreadStatus wait_on_thread(std::string name);
+  ThreadStatus wait_on_thread(std::string name = "last");
   ThreadStatus get_thread_status(std::string name);
   ThreadStatus get_thread_result(std::string name);
   std::vector<std::string> get_active_thread_names();
@@ -57,13 +62,19 @@ public:
 };
 
 template <typename T>
-void threadmanager::start_thread(std::string name, T val,
-                                 ThreadStatus (*func)(std::string, T)) {
+void threadmanager::start_thread(std::string name, T val, uint32_t node_id,
+                                 std::shared_ptr<std::vector<uint32_t>> tx_nodes,
+                                 double sim_time_start, double sim_time_end,
+                                 ThreadStatus (*func)(std::string, T, uint32_t,
+                                                      std::shared_ptr<std::vector<uint32_t>>,
+                                                      double, double)) {
   if (auto map_itr = thread_handle_map.find(name);
       map_itr == thread_handle_map.end()) {
     std::future<ThreadStatus> f =
-        std::async(std::launch::async, func, name, val);
+        std::async(std::launch::async, func, name, val, node_id, tx_nodes,
+                   sim_time_start, sim_time_end);
     thread_handle_map.insert({name, std::move(f)});
+    m_last_thread = name;
   } else {
     std::cout << "Thread " << name << " already started" << std::endl;
   }
