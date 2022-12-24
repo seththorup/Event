@@ -36,6 +36,11 @@ inline ThreadStatus future_status_to_thead_status(std::future_status fstatus) {
   return tstatus;
 }
 
+template<typename T>
+using thread_func = ThreadStatus (*)(std::string, T, uint32_t,
+                                     std::shared_ptr<std::vector<uint32_t>>,
+                                     double, double);
+
 class threadmanager {
 private:
   std::map<std::string, std::future<ThreadStatus>> thread_handle_map;
@@ -47,11 +52,9 @@ public:
 
   template <typename T>
   void start_thread(std::string name, T val, uint32_t node_id,
-                    std::shared_ptr<std::vector<uint32_t>> tx_nodes, double sim_time_start,
-                    double sim_time_end,
-                    ThreadStatus (*func)(std::string, T, uint32_t,
-                                         std::shared_ptr<std::vector<uint32_t>>, double,
-                                         double));
+                    std::shared_ptr<std::vector<uint32_t>> tx_nodes,
+                    double sim_time_start, double sim_time_end,
+                    thread_func<T> func);
 
   ThreadStatus wait_on_thread(std::string name = "last");
   ThreadStatus get_thread_status(std::string name);
@@ -62,12 +65,10 @@ public:
 };
 
 template <typename T>
-void threadmanager::start_thread(std::string name, T val, uint32_t node_id,
-                                 std::shared_ptr<std::vector<uint32_t>> tx_nodes,
-                                 double sim_time_start, double sim_time_end,
-                                 ThreadStatus (*func)(std::string, T, uint32_t,
-                                                      std::shared_ptr<std::vector<uint32_t>>,
-                                                      double, double)) {
+void threadmanager::start_thread(
+    std::string name, T val, uint32_t node_id,
+    std::shared_ptr<std::vector<uint32_t>> tx_nodes, double sim_time_start,
+    double sim_time_end, thread_func<T> func) {
   if (auto map_itr = thread_handle_map.find(name);
       map_itr == thread_handle_map.end()) {
     std::future<ThreadStatus> f =
