@@ -3,6 +3,7 @@
 #include <iostream>
 #include <mutex>
 
+#include "threadfunctor_example.h"
 #include "threadmanager.h"
 
 using std::cout;
@@ -14,20 +15,39 @@ std::mutex g_mutex;
 std::condition_variable g_cv;
 bool g_ready;
 
-thorup::ThreadStatus dummy_func(string name, uint64_t sleep_time_us) {
+thorup::ThreadStatus dummy_func(uint32_t sleep_time_us) {
 
-  cout << "Waiting on conditional Variable" << endl;
+  cout << "dummy_func"
+       << "Waiting on conditional Variable" << endl;
 
   std::unique_lock lk(g_mutex);
-  g_cv.wait(lk, [] { return g_ready; });
+  g_cv.wait(lk, []() { return g_ready; });
 
-  cout << "In Thread " << name << " sleeping for " << sleep_time_us << " (us)"
-       << endl;
+  cout << "In Thread sleeping for " << sleep_time_us << " (us)" << endl;
   lk.unlock();
 
   std::this_thread::sleep_for(std::chrono::microseconds(sleep_time_us));
 
-  cout << "Exiting Thread " << name << endl;
+  cout << "Exiting Thread " << endl;
+
+  return thorup::ThreadStatus::SUCCESS;
+}
+using dummyfunc2 = std::tuple<string, uint32_t, double>;
+
+thorup::ThreadStatus dummy_func_2(dummyfunc2 dummy) {
+  auto [func_name, sleep_time_us, dummy_val] = dummy;
+
+  cout << func_name << " Val " << dummy_val << " Waiting on conditional Variable" << endl;
+
+  std::unique_lock lk(g_mutex);
+  g_cv.wait(lk, []() { return g_ready; });
+
+  cout << "In Thread sleeping for " << sleep_time_us << " (us)" << endl;
+  lk.unlock();
+
+  std::this_thread::sleep_for(std::chrono::microseconds(sleep_time_us));
+
+  cout << "Exiting Thread " << endl;
 
   return thorup::ThreadStatus::SUCCESS;
 }
@@ -36,11 +56,18 @@ int main() {
 
   thorup::threadmanager lb_event;
   std::vector<std::pair<string, uint32_t>> func_vec = {
-      {"func_1", 300}, {"func_2", 200}, {"func_3", 100}};
+      {"func_1", 1000000}, {"func_2", 20000}, {"func_3", 100000}};
 
-  for (auto &[name, secs] : func_vec) {
-    lb_event.start_thread(name, secs, dummy_func);
+  for (auto &[name, usecs] : func_vec) {
+    thorup::threadfunctor functor(usecs, &g_mutex, &g_cv, &g_ready);
+    lb_event.start_thread(name, functor);
   }
+
+  lb_event.start_thread("dummy_func", static_cast<uint32_t>(30000), dummy_func);
+  lb_event.start_thread(
+      "dummy_func2",
+      std::make_tuple(static_cast<string>("dummy_func2"), static_cast<uint32_t>(600000), 97.2),
+      dummy_func_2);
 
   auto num_threads = lb_event.num_active_threads();
   auto thread_names = lb_event.get_active_thread_names();
@@ -66,11 +93,10 @@ int main() {
       for (auto itr = func_vec.begin(); itr != func_vec.end(); itr++) {
         auto thread_name = itr->first;
         auto status = lb_event.get_thread_status(thread_name);
-        if (status != thorup::ThreadStatus::ACTIVE &&
-            status != thorup::ThreadStatus::NOT_DEFINED) {
+        if (status != thorup::ThreadStatus::ACTIVE && status != thorup::ThreadStatus::NOT_DEFINED) {
           auto result = lb_event.get_thread_result(thread_name);
-          cout << thread_name << " complete. Result = "
-               << thorup::thread_status_to_string(result) << endl;
+          cout << thread_name << " complete. Result = " << thorup::thread_status_to_string(result)
+               << endl;
         }
       }
     }
